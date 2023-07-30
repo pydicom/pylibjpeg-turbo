@@ -1,16 +1,72 @@
-[project]
-name = "pylibjpeg-turbo"
-readme = "README.md"
-requires-python = ">=3.7"
-license = { "file" = "LICENSE" }
-authors = [{ "name" = "Pieter P", "email" = "pieter.p.dev@outlook.com" }]
-version = "1.0.0"
-description = "libjpeg-turbo wrapper"
 
 [build-system]
 requires = ["py-build-cmake~=0.1.9a3"]
 build-backend = "py_build_cmake.build"
 
+# -------- Project ---------------------------------------
+[project]
+name = "pylibjpeg-turbo"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "LICENSE" }
+authors = [{ name = "Darcy Mason", email = "darcymason@gmail.com" }]
+version = "0.1.0"
+description = "Python build of libjpeg-turbo for pydicom plugin"
+
+# see https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: BSD License",
+]
+
+dependencies = ["PyTurboJPEG"]
+
+[project.urls]
+Source = "https://github.com/pydicom/pylibjpeg-turbo"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flit",
+    "keyring",
+    "pre-commit",
+    "ruff",
+]
+docs = [
+    "mkdocs",
+    "mkdocstrings[python]",
+]
+test = [
+    "pytest >=4.0.0",
+    "pytest-cov",
+    "pytest-icdiff",
+]
+
+[project.entry-points."pylibjpeg.pixel_data_decoders"]
+"1.2.840.10008.1.2.4.50" = "pylibjpeg_turbo:decode_pixel_data"
+"1.2.840.10008.1.2.4.51" = "pylibjpeg_turbo:decode_pixel_data"
+"1.2.840.10008.1.2.4.57" = "pylibjpeg_turbo:decode_pixel_data"
+"1.2.840.10008.1.2.4.70" = "pylibjpeg_turbo:decode_pixel_data"
+"1.2.840.10008.1.2.4.80" = "pylibjpeg_turbo:decode_pixel_data"
+"1.2.840.10008.1.2.4.81" = "pylibjpeg_turbo:decode_pixel_data"
+
+[project.entry-points."pylibjpeg.jpeg_decoders"]
+pylibjpeg_turbo = "pylibjpeg_turbo:decode"
+
+[project.entry-points."pylibjpeg.jpeg_ls_decoders"]
+pylibjpeg_turbo = "pylibjpeg_turbo:decode"
+
+[project.entry-points."pylibjpeg.jpeg_xt_decoders"]
+pylibjpeg_turbo = "pylibjpeg_turbo:decode"
+
+# ------ cmake / build  ----------------------------------
+# See https://github.com/tttapa/py-build-cmake-libjpeg-turbo
+# (resulting from https://github.com/tttapa/py-build-cmake/issues/16)
 [tool.py-build-cmake.sdist]
 include = ["CMakeLists.txt", "extern/libjpeg-turbo"]
 
@@ -24,3 +80,60 @@ abi = 'none'
 [tool.cibuildwheel]
 build-verbosity = 1
 environment = { PY_BUILD_CMAKE_VERBOSE="1" }
+
+# --------- linters / formatting -------------------------
+[tool.black]
+include = '\.pyi?$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+^/.git
+^/.tox
+^/.venv
+^/.build
+^/.dist
+'''
+
+[tool.ruff]
+# see https://github.com/charliermarsh/ruff
+select = ["ALL"]
+ignore = [
+    # ignored for now, should be activated in the future
+    # docstrings
+    "D",
+    # flake8-annotations
+    "ANN",
+    # flake8-type-checking
+    "TCH",
+
+    # ignored, "black" will handle this
+    # flake8-commas
+    "COM",
+
+    # ignored, due to Windows / WSL2 setup
+    # flake8-executable
+    "EXE",
+]
+fixable = ["I"]
+fix = true
+target-version = "py38"
+
+[tool.ruff.per-file-ignores]
+# see https://github.com/charliermarsh/ruff
+"tests/*" = ["FBT003", "INP001", "PLR2004", "S101", "SLF001"]
+
+[tool.ruff.pydocstyle]
+convention = "pep257"  # Accepts: "google", "numpy", or "pep257".
+
+
+# --------- Testing --------------------------------------
+[tool.pytest.ini_options]
+markers = [
+    "functional: marks tests as functional (deselect with '-m \"not functional\"')",
+]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+    "-ra",
+]
