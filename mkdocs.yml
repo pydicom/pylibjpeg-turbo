@@ -1,0 +1,17 @@
+site_name: pylibjpeg-turbo Docs
+
+nav:
+  - Introduction: index.md
+  - Tutorials: tutorials.md
+  - How-To Guides: how-to-guides.md
+  - Reference: reference.md
+  - Explanation: explanation.md
+
+repo_url: https://github.com/pydicom/pylibjpeg-turbo
+
+theme:
+    name: readthedocs
+    highlightjs: true
+
+plugins:
+  - mkdocstrings
